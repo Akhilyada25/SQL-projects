@@ -1,0 +1,52 @@
+Telecom Network Performance Analysis
+
+Objective: Analyze network performance across different regions and detect high-latency areas.
+
+Key Features:
+
+Monitor call drop rates and data speed.
+
+Identify regions with high network failures.
+
+Generate reports on network uptime vs downtime.
+
+SQL Concepts Used: Group By, Window Functions, Case Statements.
+
+SQL Schema & Queries:
+
+-- Create Tables
+CREATE TABLE network_performance (
+    id SERIAL PRIMARY KEY,
+    region VARCHAR(100),
+    tower_id INT,
+    avg_latency_ms DECIMAL(10,2),
+    call_drop_rate DECIMAL(5,2),
+    data_speed_mbps DECIMAL(10,2),
+    uptime_percentage DECIMAL(5,2),
+    recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert Sample Data
+INSERT INTO network_performance (region, tower_id, avg_latency_ms, call_drop_rate, data_speed_mbps, uptime_percentage) 
+VALUES 
+('North', 101, 45.2, 1.5, 50.2, 99.1),
+('South', 102, 80.5, 3.2, 30.7, 95.6),
+('East', 103, 60.3, 2.1, 40.8, 97.3);
+
+-- Identify Regions with High Call Drop Rate
+SELECT region, AVG(call_drop_rate) AS avg_call_drop 
+FROM network_performance 
+GROUP BY region 
+HAVING AVG(call_drop_rate) > 2.5;
+
+-- Find Areas with Low Data Speed
+SELECT region, tower_id, data_speed_mbps 
+FROM network_performance 
+WHERE data_speed_mbps < 40 
+ORDER BY data_speed_mbps ASC;
+
+-- Network Uptime Performance by Region
+SELECT region, AVG(uptime_percentage) AS avg_uptime 
+FROM network_performance 
+GROUP BY region 
+ORDER BY avg_uptime DESC;
