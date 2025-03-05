@@ -104,14 +104,7 @@ This repository contains SQL-based projects across multiple industries, includin
 2. Import the SQL scripts into your database system (MySQL/PostgreSQL/etc.).
 3. Run queries to analyze the data and generate reports.
 
-## Requirements
-- SQL Database (MySQL, PostgreSQL, or similar)
-- Basic knowledge of SQL querying
 
-## Contributing
-Feel free to contribute by adding new queries or improving the existing scripts!
 
----
-Would you like SQL scripts for any of the listed projects? Let me know which one to start with!
 
 
