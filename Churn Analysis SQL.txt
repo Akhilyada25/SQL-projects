@@ -1,0 +1,79 @@
+-- Step 1: Create Database
+CREATE DATABASE TelecomServices;
+USE TelecomServices;
+
+-- Step 2: Create Customers Table
+CREATE TABLE Customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    age INT,
+    gender VARCHAR(10),
+    location VARCHAR(100),
+    signup_date DATE
+);
+
+-- Step 3: Create Plans Table
+CREATE TABLE Plans (
+    plan_id INT PRIMARY KEY,
+    plan_name VARCHAR(50),
+    monthly_cost DECIMAL(10,2),
+    data_limit_gb INT,
+    voice_minutes INT
+);
+
+-- Step 4: Create Subscriptions Table
+CREATE TABLE Subscriptions (
+    subscription_id INT PRIMARY KEY,
+    customer_id INT,
+    plan_id INT,
+    start_date DATE,
+    end_date DATE,
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    FOREIGN KEY (plan_id) REFERENCES Plans(plan_id)
+);
+
+-- Step 5: Create Usage Table
+CREATE TABLE Usage (
+    usage_id INT PRIMARY KEY,
+    customer_id INT,
+    month YEAR(4),
+    data_used_gb DECIMAL(10,2),
+    voice_used_minutes INT,
+    amount_paid DECIMAL(10,2),
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
+);
+
+-- Step 6: Insert Sample Data
+INSERT INTO Customers VALUES (1, 'John Doe', 30, 'Male', 'New York', '2023-01-15');
+INSERT INTO Customers VALUES (2, 'Jane Smith', 28, 'Female', 'California', '2022-11-20');
+
+INSERT INTO Plans VALUES (101, 'Basic', 20.00, 5, 500);
+INSERT INTO Plans VALUES (102, 'Premium', 50.00, 50, 2000);
+
+INSERT INTO Subscriptions VALUES (1001, 1, 101, '2023-02-01', NULL);
+INSERT INTO Subscriptions VALUES (1002, 2, 102, '2022-12-01', NULL);
+
+INSERT INTO Usage VALUES (5001, 1, '2024', 4.5, 450, 18.00);
+INSERT INTO Usage VALUES (5002, 2, '2024', 48.0, 1900, 48.50);
+
+-- Step 7: Churn Analysis Query (Customers who haven’t used services for 3 months)
+SELECT c.customer_id, c.name, s.plan_id, s.start_date
+FROM Customers c
+LEFT JOIN Subscriptions s ON c.customer_id = s.customer_id
+LEFT JOIN Usage u ON c.customer_id = u.customer_id
+WHERE u.usage_id IS NULL OR u.month < YEAR(CURDATE()) - 1;
+
+-- Step 8: Average Revenue Per User (ARPU) Calculation
+SELECT ROUND(AVG(amount_paid), 2) AS ARPU FROM Usage;
+
+-- Step 9: Most Popular Plans
+SELECT p.plan_name, COUNT(s.subscription_id) AS total_subscribers
+FROM Subscriptions s
+JOIN Plans p ON s.plan_id = p.plan_id
+GROUP BY p.plan_name
+ORDER BY total_subscribers DESC;
+
+-- Step 10: Retention Rate Calculation
+SELECT
+    COUNT(DISTINCT CASE WHEN u.month = YEAR(CURDATE()) THEN u.customer_id END) * 100.0 / COUNT(DISTINCT u.customer_id) AS retention_rate
+FROM Usage u;
